@@ -16,7 +16,7 @@ Wiki 是編譯產物，原始檔案是 source of truth。
 
 ```
 WIKI_DIR=/Users/fredchu/Documents/For_Claude/wiki
-SCRIPTS_DIR=/Users/fredchu/.claude/skills/wiki/scripts
+SCRIPTS_DIR=/Users/fredchu/dev/wiki/scripts
 ```
 
 ## 子命令路由
@@ -138,6 +138,37 @@ python3 ${SCRIPTS_DIR}/rebuild_index.py --wiki-dir ${WIKI_DIR}
 qmd update
 qmd embed
 ```
+
+### Step 5: 自動 commit（不可跳過）
+
+absorb 完成後 **必須 commit wiki 改動**，避免 metadata（_absorb_log / _index / _backlinks / _log）跟新文章脫節。
+
+```bash
+cd /Users/fredchu/Documents/For_Claude
+git add wiki/
+git status --short wiki/
+```
+
+**LLM 基於本次 absorb 的內容寫 commit message**（不要機械式「absorb N sources, +X articles」），格式參考：
+
+```
+docs(wiki): <核心主題> + <次要主題>（如有）
+
+<2-3 行 narrative：吸收的關鍵 sources、新建文章的核心 insight、
+任何 cross-link 決策。讓未來 grep 找得到這次 absorb 的脈絡>
+```
+
+範例：`docs(wiki): split llm-driven-ui-patterns from agent-workflow-patterns` (commit 59377cd) — narrative-rich，可事後 forensic。
+
+寫完 commit message 後執行：
+```bash
+git commit -m "$(cat <<'EOF'
+... (LLM 寫的 message)
+EOF
+)"
+```
+
+**不問用戶**（除非有不該 commit 的 untracked 異常檔案）— 這是用戶 audit 2026-04-29 backlog 🟡 #7 確認的 reflex。
 
 ### Anti-cramming
 
