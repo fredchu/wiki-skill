@@ -24,7 +24,7 @@ import re
 import sys
 from pathlib import Path
 
-DEFAULT_WIKI_DIR = Path("/Users/fredchu/Documents/For_Claude/wiki")
+DEFAULT_WIKI_DIR = Path("/Users/fredchu/Library/Mobile Documents/iCloud~md~obsidian/Documents/Agent 工作區/wiki")
 SCORE_TITLE = 3
 SCORE_FRONTMATTER = 2
 SCORE_BODY = 1

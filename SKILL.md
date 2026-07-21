@@ -15,9 +15,13 @@ Wiki 是編譯產物，原始檔案是 source of truth。
 ## 路徑
 
 ```
-WIKI_DIR=/Users/fredchu/Documents/For_Claude/wiki
+WIKI_DIR=/Users/fredchu/Library/Mobile Documents/iCloud~md~obsidian/Documents/Agent 工作區/wiki
 SCRIPTS_DIR=/Users/fredchu/dev/wiki/scripts
 ```
+
+> 2026-07-21 起 wiki 本體在 Obsidian vault「Agent 工作區」（iCloud），文章一律台灣繁體中文。
+> 舊位置 `For_Claude/wiki/` 已 tombstone。路徑含空格，命令中必須加引號：`--wiki-dir "${WIKI_DIR}"`。
+> git 操作走 `vault-git`（gitdir-redirect），不是 For_Claude 的 git。
 
 ## 子命令路由
 
@@ -141,12 +145,11 @@ qmd embed
 
 ### Step 5: 自動 commit（不可跳過）
 
-absorb 完成後 **必須 commit wiki 改動**，避免 metadata（_absorb_log / _index / _backlinks / _log）跟新文章脫節。
+absorb 完成後 **必須 commit wiki 改動**，避免 metadata（_absorb_log / _index / _backlinks / _log）跟新文章脫節。vault 的 git 走 gitdir-redirect wrapper：
 
 ```bash
-cd /Users/fredchu/Documents/For_Claude
-git add wiki/
-git status --short wiki/
+/Users/fredchu/bin/vault-git add wiki/
+/Users/fredchu/bin/vault-git status --short wiki/
 ```
 
 **LLM 基於本次 absorb 的內容寫 commit message**（不要機械式「absorb N sources, +X articles」），格式參考：
@@ -160,13 +163,7 @@ docs(wiki): <核心主題> + <次要主題>（如有）
 
 範例：`docs(wiki): split llm-driven-ui-patterns from agent-workflow-patterns` (commit 59377cd) — narrative-rich，可事後 forensic。
 
-寫完 commit message 後執行：
-```bash
-git commit -m "$(cat <<'EOF'
-... (LLM 寫的 message)
-EOF
-)"
-```
+寫完 commit message 後用 `/Users/fredchu/bin/vault-git commit -m "…"` 執行（訊息格式同上）。
 
 **不問用戶**（除非有不該 commit 的 untracked 異常檔案）— 這是用戶 audit 2026-04-29 backlog 🟡 #7 確認的 reflex。
 
@@ -294,7 +291,7 @@ python3 ${SCRIPTS_DIR}/wiki_log.py --wiki-dir ${WIKI_DIR} --op <ingest|query|lin
 
 ## Session Handoff 整合
 
-當 session handoff 完成後（Apple Notes 筆記已寫入），自動檢查是否有新的原始檔需要 add：
+當 session handoff 完成後（vault handoff shard 已寫入），自動檢查是否有新的原始檔需要 add：
 
 1. 執行 `absorb_log.py` 檢查 pending files
 2. 如果有 pending → 自動執行 `/wiki add`（不需用戶確認）
