@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """Scan source directories and report files needing absorption.
 
 Usage:

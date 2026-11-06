@@ -240,6 +240,21 @@ python3 ${SCRIPTS_DIR}/wiki_log.py --wiki-dir ${WIKI_DIR} --op query --detail "<
 | 孤兒 | 🟡 | backlink count = 0 |
 | 缺失候選 | 🟢 | 多篇文章提到但沒有頁面的具體名詞 |
 
+**Obsidian CLI 交叉驗證（可選，失敗直接跳過不影響主流程）**：官方 CLI 用 Obsidian 本身的
+link graph 解析（alias、大小寫、路徑省略語意都是官方口徑），拿來交叉驗證斷連/孤兒的
+LLM 判讀。需要 Obsidian app 開著；指令不存在或回錯（app 沒開、IPC 失敗）就略過這段：
+
+```bash
+# 先確認 app 在跑（CLI 會自動拉起 GUI，headless 環境不要觸發）
+pgrep -xq Obsidian || echo "SKIP: Obsidian not running"
+# 斷連（vault 全域輸出，過濾 wiki/ 來源）
+obsidian vault="Agent 工作區" unresolved verbose 2>/dev/null | grep 'wiki/'
+# 孤兒（排除 _index/_log/_outputs 等底線開頭的機制檔）
+obsidian vault="Agent 工作區" orphans 2>/dev/null | grep '^wiki/' | grep -v '^wiki/_'
+```
+
+CLI 結果與自行 parse 的結果不一致時，以 CLI 為準（它是 Obsidian 的實際解析行為）。
+
 ### Phase 2: Knowledge Gap 分析
 
 讀完所有文章後，LLM 分析：
